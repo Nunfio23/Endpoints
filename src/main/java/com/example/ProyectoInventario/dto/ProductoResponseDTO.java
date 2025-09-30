@@ -1,67 +1,27 @@
-package com.example.ProyectoInventario.entity;
+package com.example.ProyectoInventario.dto;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-
-@Entity
-@Table(name = "productos")
-public class Producto {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "producto_id")
+public class ProductoResponseDTO {
     private Long productoId;
-
-    @Column(nullable = false, unique = true, length = 64, name = "sku")
     private String sku;
-    
-    @Column(name = "precio", nullable = false, precision = 18, scale = 2)
-    private BigDecimal precio = BigDecimal.ZERO;
-
-    @Column(nullable = false, length = 200, name = "nombre")
     private String nombre;
-
-    @Column(nullable = false, name = "categoria_id")
     private Long categoriaId;
-
-    @Column(unique = true, length = 64, name = "codigo_barras")
     private String codigoBarras;
-
-    @Column(name = "stock_minimo")
     private BigDecimal stockMinimo;
-
-    @Column(name = "stock_maximo")
-    private BigDecimal  stockMaximo;
-
-    @Column(nullable = false, name = "activo")
-    private Boolean activo = true;
-
-    @Column(updatable = false, insertable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
-            name = "creado_en")
+    private BigDecimal stockMaximo;
+    private BigDecimal precio;
+    private Boolean activo;
     private LocalDateTime creadoEn;
-
-    @Column(insertable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
-            name = "actualizado_en")
     private LocalDateTime actualizadoEn;
 
-    // ===== Getters & Setters =====
+    // Getters y Setters
     public Long getProductoId() { return productoId; }
     public void setProductoId(Long productoId) { this.productoId = productoId; }
 
     public String getSku() { return sku; }
     public void setSku(String sku) { this.sku = sku; }
-
-    public BigDecimal getPrecio() { return precio; }
-    public void setPrecio(BigDecimal precio) { this.precio = precio; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
@@ -78,6 +38,9 @@ public class Producto {
     public BigDecimal getStockMaximo() { return stockMaximo; }
     public void setStockMaximo(BigDecimal stockMaximo) { this.stockMaximo = stockMaximo; }
 
+    public BigDecimal getPrecio() { return precio; }
+    public void setPrecio(BigDecimal precio) { this.precio = precio; }
+
     public Boolean getActivo() { return activo; }
     public void setActivo(Boolean activo) { this.activo = activo; }
 
@@ -87,3 +50,4 @@ public class Producto {
     public LocalDateTime getActualizadoEn() { return actualizadoEn; }
     public void setActualizadoEn(LocalDateTime actualizadoEn) { this.actualizadoEn = actualizadoEn; }
 }
+

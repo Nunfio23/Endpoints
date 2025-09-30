@@ -1,25 +1,17 @@
 package com.example.ProyectoInventario.controller;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.example.ProyectoInventario.entity.Producto;
+import com.example.ProyectoInventario.dto.ProductoCreateDTO;
+import com.example.ProyectoInventario.dto.ProductoResponseDTO;
 import com.example.ProyectoInventario.service.ProductoService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/productos")
-@Tag(name = "Productos", description = "CRUD de productos")
+@Tag(name = "Productos", description = "CRUD de productos usando DTOs")
 public class ProductoController {
 
     private final ProductoService service;
@@ -28,31 +20,31 @@ public class ProductoController {
         this.service = service;
     }
 
-    @Operation(summary = "Listar")
+    @Operation(summary = "Listar todos los productos")
     @GetMapping
-    public List<Producto> listar() {
+    public List<ProductoResponseDTO> listar() {
         return service.listar();
     }
 
-    @Operation(summary = "Obtener por ID")
+    @Operation(summary = "Obtener producto por ID")
     @GetMapping("/{id}")
-    public Producto obtener(@PathVariable Long id) {
+    public ProductoResponseDTO obtener(@PathVariable Long id) {
         return service.obtener(id);
     }
 
-    @Operation(summary = "Crear")
+    @Operation(summary = "Crear un nuevo producto")
     @PostMapping
-    public Producto crear(@RequestBody Producto p) {
-        return service.crear(p);
+    public ProductoResponseDTO crear(@RequestBody ProductoCreateDTO dto) {
+        return service.crear(dto);
     }
 
-    @Operation(summary = "Actualizar")
+    @Operation(summary = "Actualizar producto por ID")
     @PutMapping("/{id}")
-    public Producto actualizar(@PathVariable Long id, @RequestBody Producto p) {
-        return service.actualizar(id, p);
+    public ProductoResponseDTO actualizar(@PathVariable Long id, @RequestBody ProductoCreateDTO dto) {
+        return service.actualizar(id, dto);
     }
 
-    @Operation(summary = "Eliminar")
+    @Operation(summary = "Eliminar producto por ID")
     @DeleteMapping("/{id}")
     public void eliminar(@PathVariable Long id) {
         service.eliminar(id);
