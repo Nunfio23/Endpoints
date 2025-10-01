@@ -3,7 +3,6 @@ package com.example.ProyectoInventario.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,52 +15,27 @@ public class Producto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "producto_id")
     private Long productoId;
 
-    @Column(nullable = false, unique = true, length = 64, name = "sku")
     private String sku;
-    
-    @Column(name = "precio", nullable = false, precision = 18, scale = 2)
-    private BigDecimal precio = BigDecimal.ZERO;
-
-    @Column(nullable = false, length = 200, name = "nombre")
     private String nombre;
-
-    @Column(nullable = false, name = "categoria_id")
     private Long categoriaId;
-
-    @Column(unique = true, length = 64, name = "codigo_barras")
     private String codigoBarras;
-
-    @Column(name = "stock_minimo")
     private BigDecimal stockMinimo;
+    private BigDecimal stockMaximo;
+    private BigDecimal precio;
 
-    @Column(name = "stock_maximo")
-    private BigDecimal  stockMaximo;
+    private boolean activo;
 
-    @Column(nullable = false, name = "activo")
-    private Boolean activo = true;
-
-    @Column(updatable = false, insertable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
-            name = "creado_en")
     private LocalDateTime creadoEn;
-
-    @Column(insertable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
-            name = "actualizado_en")
     private LocalDateTime actualizadoEn;
 
-    // ===== Getters & Setters =====
+    // Getters y Setters
     public Long getProductoId() { return productoId; }
     public void setProductoId(Long productoId) { this.productoId = productoId; }
 
     public String getSku() { return sku; }
     public void setSku(String sku) { this.sku = sku; }
-
-    public BigDecimal getPrecio() { return precio; }
-    public void setPrecio(BigDecimal precio) { this.precio = precio; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
@@ -78,8 +52,11 @@ public class Producto {
     public BigDecimal getStockMaximo() { return stockMaximo; }
     public void setStockMaximo(BigDecimal stockMaximo) { this.stockMaximo = stockMaximo; }
 
-    public Boolean getActivo() { return activo; }
-    public void setActivo(Boolean activo) { this.activo = activo; }
+    public BigDecimal getPrecio() { return precio; }
+    public void setPrecio(BigDecimal precio) { this.precio = precio; }
+
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
 
     public LocalDateTime getCreadoEn() { return creadoEn; }
     public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }

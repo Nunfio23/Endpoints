@@ -12,7 +12,7 @@ public class ProductoResponseDTO {
     private BigDecimal stockMinimo;
     private BigDecimal stockMaximo;
     private BigDecimal precio;
-    private Boolean activo;
+    private boolean activo;
     private LocalDateTime creadoEn;
     private LocalDateTime actualizadoEn;
 
@@ -41,8 +41,8 @@ public class ProductoResponseDTO {
     public BigDecimal getPrecio() { return precio; }
     public void setPrecio(BigDecimal precio) { this.precio = precio; }
 
-    public Boolean getActivo() { return activo; }
-    public void setActivo(Boolean activo) { this.activo = activo; }
+    public boolean isActivo() { return activo; }
+    public void setActivo(boolean activo) { this.activo = activo; }
 
     public LocalDateTime getCreadoEn() { return creadoEn; }
     public void setCreadoEn(LocalDateTime creadoEn) { this.creadoEn = creadoEn; }
@@ -50,4 +50,3 @@ public class ProductoResponseDTO {
     public LocalDateTime getActualizadoEn() { return actualizadoEn; }
     public void setActualizadoEn(LocalDateTime actualizadoEn) { this.actualizadoEn = actualizadoEn; }
 }
-

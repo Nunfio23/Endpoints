@@ -2,41 +2,17 @@ package com.example.ProyectoInventario.dto;
 
 import java.math.BigDecimal;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+public class ProductoUpdateDTO {
 
-public class ProductoCreateDTO {
-
-    @NotBlank
-    private String sku;
-
-    @NotBlank
     private String nombre;
-
-    @NotNull
-    private Long categoriaId;
-
     private String codigoBarras;
-
-    @Positive
     private BigDecimal stockMinimo;
-
-    @Positive
     private BigDecimal stockMaximo;
-
-    @Positive
     private BigDecimal precio;
 
     // Getters y Setters
-    public String getSku() { return sku; }
-    public void setSku(String sku) { this.sku = sku; }
-
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
-
-    public Long getCategoriaId() { return categoriaId; }
-    public void setCategoriaId(Long categoriaId) { this.categoriaId = categoriaId; }
 
     public String getCodigoBarras() { return codigoBarras; }
     public void setCodigoBarras(String codigoBarras) { this.codigoBarras = codigoBarras; }

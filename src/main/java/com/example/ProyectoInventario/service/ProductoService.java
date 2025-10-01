@@ -4,16 +4,14 @@ import java.util.List;
 
 import com.example.ProyectoInventario.dto.ProductoCreateDTO;
 import com.example.ProyectoInventario.dto.ProductoResponseDTO;
+import com.example.ProyectoInventario.dto.ProductoUpdateDTO;
 
 public interface ProductoService {
-
-    ProductoResponseDTO crear(ProductoCreateDTO dto);
-
-    ProductoResponseDTO obtener(Long id);
-
     List<ProductoResponseDTO> listar();
-
-    ProductoResponseDTO actualizar(Long id, ProductoCreateDTO dto);
-
+    ProductoResponseDTO obtenerPorId(Long id);
+    ProductoResponseDTO crear(ProductoCreateDTO dto);
+    ProductoResponseDTO actualizar(Long id, ProductoUpdateDTO dto);
     void eliminar(Long id);
+    ProductoResponseDTO activar(Long id);
+    ProductoResponseDTO desactivar(Long id);
 }
