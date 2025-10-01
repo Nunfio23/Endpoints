@@ -17,5 +17,6 @@ public interface ProductoService {
     ProductoResponseDTO aumentarStock(Long id, int cantidad);
     ProductoResponseDTO disminuirStock(Long id, int cantidad);
     ProductoResponseDTO obtenerPorNombre(String nombre);
+    List<ProductoResponseDTO> obtenerPorCategoria(Long categoriaId);
 
 }

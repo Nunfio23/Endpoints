@@ -12,5 +12,5 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     // Buscar producto por nombre
     Optional<Producto> findByNombre(String nombre);
-
+    List<Producto> findByCategoriaId(Long categoriaId);
 }

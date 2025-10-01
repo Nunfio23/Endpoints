@@ -98,6 +98,14 @@ public class ProductoServiceImpl implements ProductoService {
         producto.setActualizadoEn(LocalDateTime.now());
         return mapToResponse(productoRepository.save(producto));
     }
+    
+    @Override
+    public List<ProductoResponseDTO> obtenerPorCategoria(Long categoriaId) {
+    return productoRepository.findByCategoriaId(categoriaId)
+            .stream()
+            .map(this::mapToResponse)
+            .collect(Collectors.toList());
+}
 
     @Override
     public ProductoResponseDTO obtenerPorNombre(String nombre) {
