@@ -11,12 +11,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.ProyectoInventario.dto.ProductoCreateDTO;
 import com.example.ProyectoInventario.dto.ProductoResponseDTO;
 import com.example.ProyectoInventario.dto.ProductoUpdateDTO;
 import com.example.ProyectoInventario.service.ProductoService;
+
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/productos")
@@ -64,5 +67,25 @@ public class ProductoController {
     @PatchMapping("/{id}/desactivar")
     public ResponseEntity<ProductoResponseDTO> desactivar(@PathVariable Long id) {
         return ResponseEntity.ok(productoService.desactivar(id));
+    }
+
+    @PutMapping("/increase-stock/{id}")
+    public ProductoResponseDTO aumentarStock(
+            @PathVariable Long id,
+            @RequestParam int quantity) {
+        return productoService.aumentarStock(id, quantity);
+    }
+
+    @PutMapping("/decrease-stock/{id}")
+    public ProductoResponseDTO disminuirStock(
+            @PathVariable Long id,
+            @RequestParam int quantity) {
+        return productoService.disminuirStock(id, quantity);
+    }
+
+    @Operation(summary = "Buscar producto por nombre", description = "Devuelve un producto filtrado por su nombre.")
+    @GetMapping("/by-name")
+    public ProductoResponseDTO obtenerPorNombre(@RequestParam String name) {
+        return productoService.obtenerPorNombre(name);
     }
 }

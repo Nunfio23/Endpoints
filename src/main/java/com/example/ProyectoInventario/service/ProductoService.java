@@ -14,4 +14,8 @@ public interface ProductoService {
     void eliminar(Long id);
     ProductoResponseDTO activar(Long id);
     ProductoResponseDTO desactivar(Long id);
+    ProductoResponseDTO aumentarStock(Long id, int cantidad);
+    ProductoResponseDTO disminuirStock(Long id, int cantidad);
+    ProductoResponseDTO obtenerPorNombre(String nombre);
+
 }
