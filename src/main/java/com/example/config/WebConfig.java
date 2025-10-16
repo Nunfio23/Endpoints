@@ -17,6 +17,7 @@ public class WebConfig {
                 registry.addMapping("/**")
                         .allowedOrigins("https://endpoints-production-4a52.up.railway.app")
                         .allowedOrigins("http://185.216.75.41")
+                        .allowedOrigins("http://37.60.243.227")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(false);
