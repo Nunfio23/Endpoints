@@ -14,12 +14,16 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI api() {
-        // Server relativo => Swagger usa el mismo origen (https en Railway)
-        Server relativeServer = new Server().url("/");
+        // Usa el protocolo correcto para Railway (HTTPS)
+        Server server = new Server()
+                .url("https://endpoints-production-4a52.up.railway.app")
+                .description("Servidor de producción en Railway");
+
         return new OpenAPI()
                 .info(new Info()
                         .title("Proyecto Inventario API")
-                        .version("1.0.0"))
-                .servers(List.of(relativeServer));
+                        .version("1.0.0")
+                        .description("Documentación generada automáticamente con SpringDoc OpenAPI"))
+                .servers(List.of(server));
     }
 }
