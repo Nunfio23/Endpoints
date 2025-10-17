@@ -14,7 +14,6 @@ public class OpenApiConfig {
 
     @Bean
     public OpenAPI api() {
-        // Usa el protocolo correcto para Railway (HTTPS)
         Server server = new Server()
                 .url("https://endpoints-production-4a52.up.railway.app")
                 .description("Servidor de producción en Railway");
