@@ -1,25 +1,19 @@
 package com.example.ProyectoInventario.controller;
 
-import java.util.List;
-
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.example.ProyectoInventario.entity.Restablecimiento;
 import com.example.ProyectoInventario.service.RestablecimientoService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/restablecimientos")
 @Tag(name = "Restablecimientos", description = "Endpoints para solicitudes de reposición de productos")
+@CrossOrigin(origins = "*")
 public class RestablecimientoController {
 
     private final RestablecimientoService service;
@@ -28,33 +22,73 @@ public class RestablecimientoController {
         this.service = service;
     }
 
+    // ============================================
+    // LISTAR
+    // ============================================
     @GetMapping
     @Operation(summary = "Listar todas las solicitudes de restablecimiento")
-    public List<Restablecimiento> listar() {
-        return service.listar();
+    public ResponseEntity<List<Restablecimiento>> listar() {
+        return ResponseEntity.ok(service.listar());
     }
 
+    // ============================================
+    // OBTENER POR ID
+    // ============================================
     @GetMapping("/{id}")
     @Operation(summary = "Obtener una solicitud de restablecimiento por ID")
-    public Restablecimiento obtener(@PathVariable Long id) {
-        return service.obtenerPorId(id);
+    public ResponseEntity<?> obtener(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(service.obtenerPorId(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body("No se encontró el restablecimiento con ID: " + id);
+        }
     }
 
+    // ============================================
+    // CREAR
+    // ============================================
     @PostMapping
     @Operation(summary = "Crear una nueva solicitud de restablecimiento")
-    public Restablecimiento crear(@RequestBody Restablecimiento restablecimiento) {
-        return service.crear(restablecimiento);
+    public ResponseEntity<?> crear(@Valid @RequestBody Restablecimiento restablecimiento) {
+        try {
+            Restablecimiento creado = service.crear(restablecimiento);
+            return ResponseEntity.ok(creado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error al crear el restablecimiento: " + e.getMessage());
+        }
     }
 
+    // ============================================
+    // ACTUALIZAR
+    // ============================================
     @PutMapping("/{id}")
     @Operation(summary = "Actualizar una solicitud de restablecimiento existente")
-    public Restablecimiento actualizar(@PathVariable Long id, @RequestBody Restablecimiento restablecimiento) {
-        return service.actualizar(id, restablecimiento);
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody Restablecimiento restablecimiento) {
+        try {
+            Restablecimiento actualizado = service.actualizar(id, restablecimiento);
+            return ResponseEntity.ok(actualizado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body("Restablecimiento no encontrado: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error al actualizar: " + e.getMessage());
+        }
     }
 
+    // ============================================
+    // ELIMINAR
+    // ============================================
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar una solicitud de restablecimiento")
-    public void eliminar(@PathVariable Long id) {
-        service.eliminar(id);
+    public ResponseEntity<?> eliminar(@PathVariable Long id) {
+        try {
+            service.eliminar(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body("No se pudo eliminar: " + e.getMessage());
+        }
     }
 }

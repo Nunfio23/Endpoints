@@ -1,15 +1,11 @@
 package com.example.ProyectoInventario.entity;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.AssertTrue;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "restablecimientos")
@@ -18,72 +14,62 @@ public class Restablecimiento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "restablecimiento_id")
-    private Long id;
+    private Long restablecimientoId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "producto_id", nullable = false)
+    @NotNull(message = "El producto es obligatorio.")
     private Producto producto;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "almacen_id", nullable = false)
+    @NotNull(message = "El almacén es obligatorio.")
     private Almacen almacen;
 
+    @NotNull(message = "La cantidad es obligatoria.")
+    @Positive(message = "La cantidad debe ser mayor que cero.")
     @Column(nullable = false)
     private Integer cantidad;
 
-    @Column(name = "fecha_solicitud", nullable = false)
-    private LocalDateTime fechaSolicitud = LocalDateTime.now();
+    @Column(name = "fecha_solicitud", nullable = false, updatable = false)
+    private LocalDateTime fechaSolicitud;
 
     @Column(length = 20, nullable = false)
     private String estado = "PENDIENTE"; // PENDIENTE, APROBADO, RECHAZADO
 
-    // ====== Getters y Setters ======
-
-    public Long getId() {
-        return id;
+    // ===== Validaciones personalizadas =====
+    @AssertTrue(message = "La fecha de solicitud no puede ser futura.")
+    public boolean isFechaValida() {
+        return fechaSolicitud == null || !fechaSolicitud.isAfter(LocalDateTime.now());
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    // ===== Hook de persistencia =====
+    @PrePersist
+    public void prePersist() {
+        if (fechaSolicitud == null) {
+            fechaSolicitud = LocalDateTime.now();
+        }
+        if (estado == null) {
+            estado = "PENDIENTE";
+        }
     }
 
-    public Producto getProducto() {
-        return producto;
-    }
+    // ===== Getters y Setters =====
+    public Long getRestablecimientoId() { return restablecimientoId; }
+    public void setRestablecimientoId(Long restablecimientoId) { this.restablecimientoId = restablecimientoId; }
 
-    public void setProducto(Producto producto) {
-        this.producto = producto;
-    }
+    public Producto getProducto() { return producto; }
+    public void setProducto(Producto producto) { this.producto = producto; }
 
-    public Almacen getAlmacen() {
-        return almacen;
-    }
+    public Almacen getAlmacen() { return almacen; }
+    public void setAlmacen(Almacen almacen) { this.almacen = almacen; }
 
-    public void setAlmacen(Almacen almacen) {
-        this.almacen = almacen;
-    }
+    public Integer getCantidad() { return cantidad; }
+    public void setCantidad(Integer cantidad) { this.cantidad = cantidad; }
 
-    public Integer getCantidad() {
-        return cantidad;
-    }
+    public LocalDateTime getFechaSolicitud() { return fechaSolicitud; }
+    public void setFechaSolicitud(LocalDateTime fechaSolicitud) { this.fechaSolicitud = fechaSolicitud; }
 
-    public void setCantidad(Integer cantidad) {
-        this.cantidad = cantidad;
-    }
-
-    public LocalDateTime getFechaSolicitud() {
-        return fechaSolicitud;
-    }
-
-    public void setFechaSolicitud(LocalDateTime fechaSolicitud) {
-        this.fechaSolicitud = fechaSolicitud;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
 }
