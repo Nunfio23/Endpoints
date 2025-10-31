@@ -40,30 +40,37 @@ public class GestionServiceImpl implements GestionService {
     }
 
     // ========= NUEVOS =========
-    @Override
-    public GestionResponseDTO crear(GestionCreateDTO dto) {
-        if (dto == null || dto.getRestablecimientoId() == null) {
-            throw new IllegalArgumentException("Datos de gestión inválidos.");
-        }
-
-        Restablecimiento r = restablecimientoRepository.findById(dto.getRestablecimientoId())
-                .orElseThrow(() -> new IllegalArgumentException(
-                        "No se encontró el restablecimiento con ID: " + dto.getRestablecimientoId()));
-
-        // opcional: impedir duplicado pendiente sobre el mismo restablecimiento
-        // if (gestionRepository.existsByRestablecimiento_RestablecimientoId(r.getRestablecimientoId())) {
-        //     throw new IllegalArgumentException("Ya existe una gestión para este restablecimiento.");
-        // }
-
-        Gestion g = new Gestion();
-        g.setRestablecimiento(r);
-        g.setAprobado(null); // pendiente
-        g.setObservacion(dto.getObservacion());
-        g.setFechaAprobacion(null);
-
-        Gestion guardada = gestionRepository.save(g);
-        return toResponse(guardada);
+@Override
+public GestionResponseDTO crear(GestionCreateDTO dto) {
+    if (dto == null) {
+        throw new IllegalArgumentException("No se recibieron datos de la gestión.");
     }
+
+    // ✅ Tomar el ID ya sea del campo plano o del objeto anidado
+    Long restId = dto.getRestablecimientoId() != null
+            ? dto.getRestablecimientoId()
+            : (dto.getRestablecimiento() != null
+                ? dto.getRestablecimiento().getRestablecimientoId()
+                : null);
+
+    if (restId == null) {
+        throw new IllegalArgumentException("Debe especificar el ID del restablecimiento.");
+    }
+
+    // Buscar el restablecimiento
+    Restablecimiento r = restablecimientoRepository.findById(restId)
+            .orElseThrow(() -> new IllegalArgumentException("No se encontró el restablecimiento con ID: " + restId));
+
+    // Crear la gestión pendiente
+    Gestion g = new Gestion();
+    g.setRestablecimiento(r);
+    g.setAprobado(null); // pendiente
+    g.setObservacion(dto.getObservacion());
+    g.setFechaAprobacion(null);
+
+    Gestion guardada = gestionRepository.save(g);
+    return toResponse(guardada);
+}
 
     @Override
     public GestionResponseDTO actualizar(Long id, GestionCreateDTO dto) {
