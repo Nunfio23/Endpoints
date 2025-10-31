@@ -47,67 +47,56 @@ public class GestionServiceImpl implements GestionService {
     // ======================================================
     // APROBAR UNA GESTIÓN (Y SU RESTABLECIMIENTO ASOCIADO)
     // ======================================================
-    @Override
-    public GestionResponseDTO aprobar(Long id, String observacion) {
-        Gestion g = gestionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró la gestión con ID: " + id));
+   @Override
+public GestionResponseDTO aprobar(Long id, String observacion) {
+    // Buscar la gestión
+    Gestion g = gestionRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("No se encontró la gestión con ID: " + id));
 
-        Restablecimiento r = g.getRestablecimiento();
-        if (r == null) {
-            throw new IllegalArgumentException("Esta gestión no tiene un restablecimiento asociado.");
-        }
-
-        if (!"PENDIENTE".equalsIgnoreCase(r.getEstado())) {
-            throw new IllegalArgumentException("Solo se pueden aprobar solicitudes en estado PENDIENTE.");
-        }
-
-        // Actualiza gestión
-        g.setAprobado(true);
-        g.setObservacion(observacion != null ? observacion : "Aprobado correctamente");
-        g.setFechaAprobacion(LocalDateTime.now());
-
-        // Actualiza restablecimiento
-        r.setEstado("APROBADO");
-        restablecimientoRepository.save(r);
-        Gestion guardada = gestionRepository.save(g);
-
-        return toResponse(guardada);
+    Restablecimiento r = g.getRestablecimiento();
+    if (r == null) {
+        throw new IllegalArgumentException("Esta gestión no tiene un restablecimiento asociado.");
     }
 
-    // ======================================================
-    // RECHAZAR UNA GESTIÓN (Y SU RESTABLECIMIENTO ASOCIADO)
-    // ======================================================
-    @Override
-    public GestionResponseDTO rechazar(Long id, String observacion) {
-        Gestion g = gestionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró la gestión con ID: " + id));
-
-        Restablecimiento r = g.getRestablecimiento();
-        if (r == null) {
-            throw new IllegalArgumentException("Esta gestión no tiene un restablecimiento asociado.");
-        }
-
-        if (!"PENDIENTE".equalsIgnoreCase(r.getEstado())) {
-            throw new IllegalArgumentException("Solo se pueden rechazar solicitudes en estado PENDIENTE.");
-        }
-
-        // Validación observación
-        if (observacion == null || observacion.trim().isEmpty()) {
-            observacion = "Gestión rechazada";
-        }
-
-        // Actualiza gestión
-        g.setAprobado(false);
-        g.setObservacion(observacion);
-        g.setFechaAprobacion(LocalDateTime.now());
-
-        // Actualiza restablecimiento
-        r.setEstado("RECHAZADO");
-        restablecimientoRepository.save(r);
-        Gestion guardada = gestionRepository.save(g);
-
-        return toResponse(guardada);
+    if (Boolean.TRUE.equals(g.getAprobado())) {
+        throw new IllegalArgumentException("Esta gestión ya fue aprobada.");
     }
+
+    g.setAprobado(true);
+    g.setObservacion(observacion != null ? observacion : "Aprobado correctamente");
+    g.setFechaAprobacion(LocalDateTime.now());
+
+    r.setEstado("APROBADO");
+    restablecimientoRepository.save(r);
+    Gestion guardada = gestionRepository.save(g);
+
+    return toResponse(guardada);
+}
+
+@Override
+public GestionResponseDTO rechazar(Long id, String observacion) {
+    Gestion g = gestionRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("No se encontró la gestión con ID: " + id));
+
+    Restablecimiento r = g.getRestablecimiento();
+    if (r == null) {
+        throw new IllegalArgumentException("Esta gestión no tiene un restablecimiento asociado.");
+    }
+
+    if (Boolean.FALSE.equals(g.getAprobado())) {
+        throw new IllegalArgumentException("Esta gestión ya fue rechazada.");
+    }
+
+    g.setAprobado(false);
+    g.setObservacion(observacion != null ? observacion : "Rechazado por el administrador");
+    g.setFechaAprobacion(LocalDateTime.now());
+
+    r.setEstado("RECHAZADO");
+    restablecimientoRepository.save(r);
+    Gestion guardada = gestionRepository.save(g);
+
+    return toResponse(guardada);
+}
 
     // ======================================================
     // ELIMINAR GESTIÓN
