@@ -23,6 +23,9 @@ public class GestionServiceImpl implements GestionService {
         this.restablecimientoRepository = restablecimientoRepository;
     }
 
+    // ======================================================
+    // LISTAR TODAS LAS GESTIONES
+    // ======================================================
     @Override
     public List<GestionResponseDTO> listar() {
         return gestionRepository.findAll()
@@ -31,6 +34,9 @@ public class GestionServiceImpl implements GestionService {
                 .collect(Collectors.toList());
     }
 
+    // ======================================================
+    // OBTENER GESTIÓN POR ID
+    // ======================================================
     @Override
     public GestionResponseDTO obtenerPorId(Long id) {
         Gestion g = gestionRepository.findById(id)
@@ -39,71 +45,72 @@ public class GestionServiceImpl implements GestionService {
     }
 
     // ======================================================
-    // MÉTODO: APROBAR
+    // APROBAR UNA GESTIÓN (Y SU RESTABLECIMIENTO ASOCIADO)
     // ======================================================
     @Override
     public GestionResponseDTO aprobar(Long id, String observacion) {
-        Restablecimiento r = restablecimientoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el restablecimiento con ID: " + id));
+        Gestion g = gestionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró la gestión con ID: " + id));
+
+        Restablecimiento r = g.getRestablecimiento();
+        if (r == null) {
+            throw new IllegalArgumentException("Esta gestión no tiene un restablecimiento asociado.");
+        }
 
         if (!"PENDIENTE".equalsIgnoreCase(r.getEstado())) {
             throw new IllegalArgumentException("Solo se pueden aprobar solicitudes en estado PENDIENTE.");
         }
 
-        // Validar que no exista ya gestión
-        if (gestionRepository.existsByRestablecimiento_RestablecimientoId(r.getRestablecimientoId())) {
-            throw new IllegalArgumentException("Ya existe una gestión para este restablecimiento.");
-        }
-
-        Gestion g = new Gestion();
-        g.setRestablecimiento(r);
+        // Actualiza gestión
         g.setAprobado(true);
-        g.setObservacion(observacion);
+        g.setObservacion(observacion != null ? observacion : "Aprobado correctamente");
         g.setFechaAprobacion(LocalDateTime.now());
 
-        // Actualiza estado del restablecimiento
+        // Actualiza restablecimiento
         r.setEstado("APROBADO");
         restablecimientoRepository.save(r);
-
         Gestion guardada = gestionRepository.save(g);
+
         return toResponse(guardada);
     }
 
     // ======================================================
-    // MÉTODO: RECHAZAR
+    // RECHAZAR UNA GESTIÓN (Y SU RESTABLECIMIENTO ASOCIADO)
     // ======================================================
     @Override
     public GestionResponseDTO rechazar(Long id, String observacion) {
-        Restablecimiento r = restablecimientoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el restablecimiento con ID: " + id));
+        Gestion g = gestionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró la gestión con ID: " + id));
+
+        Restablecimiento r = g.getRestablecimiento();
+        if (r == null) {
+            throw new IllegalArgumentException("Esta gestión no tiene un restablecimiento asociado.");
+        }
 
         if (!"PENDIENTE".equalsIgnoreCase(r.getEstado())) {
             throw new IllegalArgumentException("Solo se pueden rechazar solicitudes en estado PENDIENTE.");
         }
 
+        // Validación observación
         if (observacion == null || observacion.trim().isEmpty()) {
-            throw new IllegalArgumentException("Debe especificar una observación al rechazar.");
+            observacion = "Gestión rechazada";
         }
 
-        if (gestionRepository.existsByRestablecimiento_RestablecimientoId(r.getRestablecimientoId())) {
-            throw new IllegalArgumentException("Ya existe una gestión para este restablecimiento.");
-        }
-
-        Gestion g = new Gestion();
-        g.setRestablecimiento(r);
+        // Actualiza gestión
         g.setAprobado(false);
         g.setObservacion(observacion);
         g.setFechaAprobacion(LocalDateTime.now());
 
+        // Actualiza restablecimiento
         r.setEstado("RECHAZADO");
         restablecimientoRepository.save(r);
-
         Gestion guardada = gestionRepository.save(g);
+
         return toResponse(guardada);
     }
 
     // ======================================================
-    // ELIMINAR
+    // ELIMINAR GESTIÓN
     // ======================================================
     @Override
     public void eliminar(Long id) {
@@ -114,12 +121,14 @@ public class GestionServiceImpl implements GestionService {
     }
 
     // ======================================================
-    // MAPEO ENTIDAD → DTO
+    // MAPEADOR ENTIDAD → DTO
     // ======================================================
     private GestionResponseDTO toResponse(Gestion g) {
         GestionResponseDTO dto = new GestionResponseDTO();
         dto.setGestionId(g.getId());
-        dto.setRestablecimientoId(g.getRestablecimiento().getRestablecimientoId());
+        dto.setRestablecimientoId(
+                g.getRestablecimiento() != null ? g.getRestablecimiento().getRestablecimientoId() : null
+        );
         dto.setAprobado(g.getAprobado());
         dto.setFechaAprobacion(g.getFechaAprobacion());
         dto.setObservacion(g.getObservacion());
