@@ -1,6 +1,8 @@
 package com.example.ProyectoInventario.controller;
 
-import com.example.ProyectoInventario.entity.Entrega;
+import com.example.ProyectoInventario.dto.EntregaCreateDTO;
+import com.example.ProyectoInventario.dto.EntregaUpdateDTO;
+import com.example.ProyectoInventario.dto.EntregaResponseDTO;
 import com.example.ProyectoInventario.service.EntregaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -12,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/entregas")
-@Tag(name = "Entregas", description = "CRUD de entregas")
+@Tag(name = "Entregas", description = "CRUD de entregas con validaciones y DTOs")
 @CrossOrigin(origins = "*")
 public class EntregaController {
 
@@ -27,7 +29,7 @@ public class EntregaController {
     // ============================================
     @Operation(summary = "Listar entregas")
     @GetMapping
-    public ResponseEntity<List<Entrega>> listar() {
+    public ResponseEntity<List<EntregaResponseDTO>> listar() {
         return ResponseEntity.ok(service.listar());
     }
 
@@ -38,7 +40,7 @@ public class EntregaController {
     @GetMapping("/{id}")
     public ResponseEntity<?> obtener(@PathVariable Long id) {
         try {
-            Entrega entrega = service.obtener(id);
+            EntregaResponseDTO entrega = service.obtener(id);
             return ResponseEntity.ok(entrega);
         } catch (RuntimeException ex) {
             return ResponseEntity.status(404).body(ex.getMessage());
@@ -50,9 +52,9 @@ public class EntregaController {
     // ============================================
     @Operation(summary = "Crear entrega")
     @PostMapping
-    public ResponseEntity<?> crear(@Valid @RequestBody Entrega e) {
+    public ResponseEntity<?> crear(@Valid @RequestBody EntregaCreateDTO dto) {
         try {
-            Entrega creada = service.crear(e);
+            EntregaResponseDTO creada = service.crear(dto);
             return ResponseEntity.ok(creada);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
@@ -66,9 +68,9 @@ public class EntregaController {
     // ============================================
     @Operation(summary = "Actualizar entrega")
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody Entrega e) {
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody EntregaUpdateDTO dto) {
         try {
-            Entrega actualizada = service.actualizar(id, e);
+            EntregaResponseDTO actualizada = service.actualizar(id, dto);
             return ResponseEntity.ok(actualizada);
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());

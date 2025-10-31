@@ -1,16 +1,19 @@
 package com.example.ProyectoInventario.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
+import com.example.ProyectoInventario.dto.EntregaCreateDTO;
+import com.example.ProyectoInventario.dto.EntregaUpdateDTO;
+import com.example.ProyectoInventario.dto.EntregaResponseDTO;
 import com.example.ProyectoInventario.entity.Almacen;
 import com.example.ProyectoInventario.entity.Entrega;
 import com.example.ProyectoInventario.entity.Producto;
 import com.example.ProyectoInventario.repository.AlmacenRepository;
 import com.example.ProyectoInventario.repository.EntregaRepository;
 import com.example.ProyectoInventario.repository.ProductoRepository;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EntregaServiceImpl implements EntregaService {
@@ -31,97 +34,88 @@ public class EntregaServiceImpl implements EntregaService {
     // LISTAR Y OBTENER
     // ============================
     @Override
-    public List<Entrega> listar() {
-        return entregaRepository.findAll();
+    public List<EntregaResponseDTO> listar() {
+        return entregaRepository.findAll()
+                .stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Entrega obtener(Long id) {
-        return entregaRepository.findById(id)
+    public EntregaResponseDTO obtener(Long id) {
+        Entrega entrega = entregaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Entrega no encontrada con id: " + id));
+        return toResponseDTO(entrega);
     }
 
     // ============================
     // CREAR (con validaciones)
     // ============================
     @Override
-    public Entrega crear(Entrega e) {
+    public EntregaResponseDTO crear(EntregaCreateDTO dto) {
 
-        if (e == null) {
+        if (dto == null) {
             throw new IllegalArgumentException("No se recibieron datos de la entrega.");
         }
 
-        if (e.getProducto() == null || e.getProducto().getProductoId() == null) {
+        if (dto.getProductoId() == null) {
             throw new IllegalArgumentException("Debe especificar un producto válido.");
         }
 
-        if (e.getAlmacen() == null || e.getAlmacen().getAlmacenId() == null) {
+        if (dto.getAlmacenId() == null) {
             throw new IllegalArgumentException("Debe especificar un almacén válido.");
         }
 
-        if (e.getCantidad() == null || e.getCantidad() <= 0) {
+        if (dto.getCantidad() == null || dto.getCantidad() <= 0) {
             throw new IllegalArgumentException("La cantidad debe ser mayor que cero.");
         }
 
         // Validar existencia de producto y almacén
-        Producto producto = productoRepository.findById(e.getProducto().getProductoId())
+        Producto producto = productoRepository.findById(dto.getProductoId())
                 .orElseThrow(() -> new IllegalArgumentException("El producto especificado no existe."));
 
-        Almacen almacen = almacenRepository.findById(e.getAlmacen().getAlmacenId())
+        Almacen almacen = almacenRepository.findById(dto.getAlmacenId())
                 .orElseThrow(() -> new IllegalArgumentException("El almacén especificado no existe."));
 
-        // Validar fecha de entrega no futura
-        if (e.getFechaEntrega() != null && e.getFechaEntrega().isAfter(LocalDateTime.now())) {
-            throw new IllegalArgumentException("La fecha de entrega no puede ser futura.");
-        }
-
-        // Evitar duplicados
+        // Evitar duplicados (mismo producto, almacén y fecha actual)
+        LocalDateTime fecha = LocalDateTime.now();
         if (entregaRepository.existsByProducto_ProductoIdAndAlmacen_AlmacenIdAndFechaEntrega(
-                producto.getProductoId(), almacen.getAlmacenId(), e.getFechaEntrega() != null ? e.getFechaEntrega() : LocalDateTime.now()
-        )) {
+                producto.getProductoId(), almacen.getAlmacenId(), fecha)) {
             throw new IllegalArgumentException("Ya existe una entrega registrada para este producto, almacén y fecha.");
         }
 
-        // Asignar relaciones y fecha
-        e.setProducto(producto);
-        e.setAlmacen(almacen);
-        if (e.getFechaEntrega() == null) e.setFechaEntrega(LocalDateTime.now());
+        // Crear nueva entrega
+        Entrega entrega = new Entrega();
+        entrega.setProducto(producto);
+        entrega.setAlmacen(almacen);
+        entrega.setCantidad(dto.getCantidad());
+        entrega.setFechaEntrega(fecha);
 
-        return entregaRepository.save(e);
+        Entrega guardada = entregaRepository.save(entrega);
+        return toResponseDTO(guardada);
     }
 
     // ============================
-    // ACTUALIZAR
+    // ACTUALIZAR (con validaciones)
     // ============================
     @Override
-    public Entrega actualizar(Long id, Entrega datos) {
+    public EntregaResponseDTO actualizar(Long id, EntregaUpdateDTO dto) {
         Entrega existente = entregaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Entrega no encontrada con id: " + id));
 
-        if (datos.getCantidad() != null && datos.getCantidad() <= 0) {
+        if (dto.getCantidad() != null && dto.getCantidad() <= 0) {
             throw new IllegalArgumentException("La cantidad debe ser mayor que cero.");
         }
 
-        if (datos.getFechaEntrega() != null && datos.getFechaEntrega().isAfter(LocalDateTime.now())) {
+        if (dto.getFechaEntrega() != null && dto.getFechaEntrega().isAfter(LocalDateTime.now())) {
             throw new IllegalArgumentException("La fecha de entrega no puede ser futura.");
         }
 
-        if (datos.getProducto() != null) {
-            Producto producto = productoRepository.findById(datos.getProducto().getProductoId())
-                    .orElseThrow(() -> new IllegalArgumentException("El producto especificado no existe."));
-            existente.setProducto(producto);
-        }
+        if (dto.getCantidad() != null) existente.setCantidad(dto.getCantidad());
+        if (dto.getFechaEntrega() != null) existente.setFechaEntrega(dto.getFechaEntrega());
 
-        if (datos.getAlmacen() != null) {
-            Almacen almacen = almacenRepository.findById(datos.getAlmacen().getAlmacenId())
-                    .orElseThrow(() -> new IllegalArgumentException("El almacén especificado no existe."));
-            existente.setAlmacen(almacen);
-        }
-
-        if (datos.getCantidad() != null) existente.setCantidad(datos.getCantidad());
-        if (datos.getFechaEntrega() != null) existente.setFechaEntrega(datos.getFechaEntrega());
-
-        return entregaRepository.save(existente);
+        Entrega actualizada = entregaRepository.save(existente);
+        return toResponseDTO(actualizada);
     }
 
     // ============================
@@ -133,5 +127,18 @@ public class EntregaServiceImpl implements EntregaService {
             throw new IllegalArgumentException("No existe una entrega con el ID proporcionado.");
         }
         entregaRepository.deleteById(id);
+    }
+
+    // ============================
+    // CONVERSIÓN ENTIDAD → DTO
+    // ============================
+    private EntregaResponseDTO toResponseDTO(Entrega e) {
+        EntregaResponseDTO dto = new EntregaResponseDTO();
+        dto.setEntregaId(e.getEntregaId());
+        dto.setProductoId(e.getProducto() != null ? e.getProducto().getProductoId() : null);
+        dto.setAlmacenId(e.getAlmacen() != null ? e.getAlmacen().getAlmacenId() : null);
+        dto.setCantidad(e.getCantidad());
+        dto.setFechaEntrega(e.getFechaEntrega());
+        return dto;
     }
 }
