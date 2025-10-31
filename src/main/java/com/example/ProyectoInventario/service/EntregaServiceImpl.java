@@ -41,6 +41,13 @@ public class EntregaServiceImpl implements EntregaService {
                 .collect(Collectors.toList());
     }
 
+   @Override
+    public List<Entrega> listarEntidades() {
+    return entregaRepository.findAll();
+    }
+
+
+
     @Override
     public EntregaResponseDTO obtener(Long id) {
         Entrega entrega = entregaRepository.findById(id)
@@ -115,13 +122,18 @@ public class EntregaServiceImpl implements EntregaService {
     // ============================
     // CONVERSIÓN ENTIDAD → DTO
     // ============================
-    private EntregaResponseDTO toResponse(Entrega e) {
-        EntregaResponseDTO dto = new EntregaResponseDTO();
-        dto.setEntregaId(e.getEntregaId());
-        dto.setProductoId(e.getProducto().getProductoId());
-        dto.setAlmacenId(e.getAlmacen().getAlmacenId());
-        dto.setCantidad(e.getCantidad());
-        dto.setFechaEntrega(e.getFechaEntrega());
-        return dto;
-    }
+private EntregaResponseDTO toResponse(Entrega e) {
+    EntregaResponseDTO dto = new EntregaResponseDTO();
+    dto.setEntregaId(e.getEntregaId());
+    dto.setProductoId(e.getProducto().getProductoId());
+    dto.setAlmacenId(e.getAlmacen().getAlmacenId());
+
+    // ⬇⬇⬇ AGREGA ESTAS DOS LÍNEAS ⬇⬇⬇
+    dto.setProductoNombre(e.getProducto().getNombre());
+    dto.setAlmacenNombre(e.getAlmacen().getNombre());
+
+    dto.setCantidad(e.getCantidad());
+    dto.setFechaEntrega(e.getFechaEntrega());
+    return dto;
+}
 }

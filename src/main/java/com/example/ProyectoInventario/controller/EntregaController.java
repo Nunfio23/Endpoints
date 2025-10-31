@@ -4,11 +4,14 @@ import com.example.ProyectoInventario.dto.EntregaCreateDTO;
 import com.example.ProyectoInventario.dto.EntregaUpdateDTO;
 import com.example.ProyectoInventario.dto.EntregaResponseDTO;
 import com.example.ProyectoInventario.service.EntregaService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -23,12 +26,17 @@ public class EntregaController {
         this.service = service;
     }
 
+    // ✅ LISTAR ENTREGAS (ahora usa el service.listar() normal)
     @Operation(summary = "Listar entregas")
     @GetMapping
     public ResponseEntity<List<EntregaResponseDTO>> listar() {
-        return ResponseEntity.ok(service.listar());
+    List<EntregaResponseDTO> response = service.listar();
+    // aquí podrías aplicar filtros o logs
+    return ResponseEntity.ok(response);
     }
 
+
+    // ✅ OBTENER ENTREGA POR ID
     @Operation(summary = "Obtener entrega por ID")
     @GetMapping("/{id}")
     public ResponseEntity<?> obtener(@PathVariable Long id) {
@@ -39,6 +47,7 @@ public class EntregaController {
         }
     }
 
+    // ✅ CREAR ENTREGA
     @Operation(summary = "Crear entrega")
     @PostMapping
     public ResponseEntity<?> crear(@Valid @RequestBody EntregaCreateDTO dto) {
@@ -47,10 +56,12 @@ public class EntregaController {
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         } catch (Exception ex) {
-            return ResponseEntity.internalServerError().body("Error al crear entrega: " + ex.getMessage());
+            return ResponseEntity.internalServerError()
+                    .body("Error al crear entrega: " + ex.getMessage());
         }
     }
 
+    // ✅ ACTUALIZAR ENTREGA
     @Operation(summary = "Actualizar entrega")
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody EntregaUpdateDTO dto) {
@@ -59,10 +70,12 @@ public class EntregaController {
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         } catch (Exception ex) {
-            return ResponseEntity.internalServerError().body("Error al actualizar entrega: " + ex.getMessage());
+            return ResponseEntity.internalServerError()
+                    .body("Error al actualizar entrega: " + ex.getMessage());
         }
     }
 
+    // ✅ ELIMINAR ENTREGA
     @Operation(summary = "Eliminar entrega")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> eliminar(@PathVariable Long id) {
