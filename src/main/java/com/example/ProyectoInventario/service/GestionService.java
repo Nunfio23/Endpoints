@@ -1,20 +1,17 @@
 package com.example.ProyectoInventario.service;
 
+import com.example.ProyectoInventario.dto.GestionResponseDTO;
 import java.util.List;
-
-import com.example.ProyectoInventario.entity.Gestion;
 
 public interface GestionService {
 
-    List<Gestion> listar();
+    List<GestionResponseDTO> listar();
 
-    Gestion obtenerPorId(Long id);
+    GestionResponseDTO obtenerPorId(Long id);
 
-    Gestion crear(Gestion gestion);
+    GestionResponseDTO aprobar(Long id, String observacion);
 
-    Gestion aprobar(Long id, String observacion);
-
-    Gestion rechazar(Long id, String observacion);
+    GestionResponseDTO rechazar(Long id, String observacion);
 
     void eliminar(Long id);
 }

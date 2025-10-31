@@ -37,15 +37,15 @@ public class EntregaServiceImpl implements EntregaService {
     public List<EntregaResponseDTO> listar() {
         return entregaRepository.findAll()
                 .stream()
-                .map(this::toResponseDTO)
+                .map(this::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public EntregaResponseDTO obtener(Long id) {
         Entrega entrega = entregaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Entrega no encontrada con id: " + id));
-        return toResponseDTO(entrega);
+                .orElseThrow(() -> new IllegalArgumentException("Entrega no encontrada con ID: " + id));
+        return toResponse(entrega);
     }
 
     // ============================
@@ -53,69 +53,53 @@ public class EntregaServiceImpl implements EntregaService {
     // ============================
     @Override
     public EntregaResponseDTO crear(EntregaCreateDTO dto) {
-
-        if (dto == null) {
-            throw new IllegalArgumentException("No se recibieron datos de la entrega.");
-        }
-
-        if (dto.getProductoId() == null) {
-            throw new IllegalArgumentException("Debe especificar un producto válido.");
-        }
-
-        if (dto.getAlmacenId() == null) {
-            throw new IllegalArgumentException("Debe especificar un almacén válido.");
-        }
-
-        if (dto.getCantidad() == null || dto.getCantidad() <= 0) {
+        if (dto == null) throw new IllegalArgumentException("Datos de entrega no recibidos.");
+        if (dto.getCantidad() == null || dto.getCantidad() <= 0)
             throw new IllegalArgumentException("La cantidad debe ser mayor que cero.");
-        }
 
-        // Validar existencia de producto y almacén
         Producto producto = productoRepository.findById(dto.getProductoId())
-                .orElseThrow(() -> new IllegalArgumentException("El producto especificado no existe."));
+                .orElseThrow(() -> new IllegalArgumentException("Producto no encontrado con ID: " + dto.getProductoId()));
 
         Almacen almacen = almacenRepository.findById(dto.getAlmacenId())
-                .orElseThrow(() -> new IllegalArgumentException("El almacén especificado no existe."));
+                .orElseThrow(() -> new IllegalArgumentException("Almacén no encontrado con ID: " + dto.getAlmacenId()));
 
-        // Evitar duplicados (mismo producto, almacén y fecha actual)
-        LocalDateTime fecha = LocalDateTime.now();
+        LocalDateTime fechaActual = LocalDateTime.now();
+
+        // Evitar duplicados por producto + almacén + fecha actual
         if (entregaRepository.existsByProducto_ProductoIdAndAlmacen_AlmacenIdAndFechaEntrega(
-                producto.getProductoId(), almacen.getAlmacenId(), fecha)) {
+                producto.getProductoId(), almacen.getAlmacenId(), fechaActual)) {
             throw new IllegalArgumentException("Ya existe una entrega registrada para este producto, almacén y fecha.");
         }
 
-        // Crear nueva entrega
         Entrega entrega = new Entrega();
         entrega.setProducto(producto);
         entrega.setAlmacen(almacen);
         entrega.setCantidad(dto.getCantidad());
-        entrega.setFechaEntrega(fecha);
+        entrega.setFechaEntrega(fechaActual);
 
         Entrega guardada = entregaRepository.save(entrega);
-        return toResponseDTO(guardada);
+        return toResponse(guardada);
     }
 
     // ============================
-    // ACTUALIZAR (con validaciones)
+    // ACTUALIZAR
     // ============================
     @Override
     public EntregaResponseDTO actualizar(Long id, EntregaUpdateDTO dto) {
         Entrega existente = entregaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Entrega no encontrada con id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Entrega no encontrada con ID: " + id));
 
-        if (dto.getCantidad() != null && dto.getCantidad() <= 0) {
+        if (dto.getCantidad() != null && dto.getCantidad() <= 0)
             throw new IllegalArgumentException("La cantidad debe ser mayor que cero.");
-        }
 
-        if (dto.getFechaEntrega() != null && dto.getFechaEntrega().isAfter(LocalDateTime.now())) {
+        if (dto.getFechaEntrega() != null && dto.getFechaEntrega().isAfter(LocalDateTime.now()))
             throw new IllegalArgumentException("La fecha de entrega no puede ser futura.");
-        }
 
         if (dto.getCantidad() != null) existente.setCantidad(dto.getCantidad());
         if (dto.getFechaEntrega() != null) existente.setFechaEntrega(dto.getFechaEntrega());
 
         Entrega actualizada = entregaRepository.save(existente);
-        return toResponseDTO(actualizada);
+        return toResponse(actualizada);
     }
 
     // ============================
@@ -123,20 +107,19 @@ public class EntregaServiceImpl implements EntregaService {
     // ============================
     @Override
     public void eliminar(Long id) {
-        if (!entregaRepository.existsById(id)) {
+        if (!entregaRepository.existsById(id))
             throw new IllegalArgumentException("No existe una entrega con el ID proporcionado.");
-        }
         entregaRepository.deleteById(id);
     }
 
     // ============================
     // CONVERSIÓN ENTIDAD → DTO
     // ============================
-    private EntregaResponseDTO toResponseDTO(Entrega e) {
+    private EntregaResponseDTO toResponse(Entrega e) {
         EntregaResponseDTO dto = new EntregaResponseDTO();
         dto.setEntregaId(e.getEntregaId());
-        dto.setProductoId(e.getProducto() != null ? e.getProducto().getProductoId() : null);
-        dto.setAlmacenId(e.getAlmacen() != null ? e.getAlmacen().getAlmacenId() : null);
+        dto.setProductoId(e.getProducto().getProductoId());
+        dto.setAlmacenId(e.getAlmacen().getAlmacenId());
         dto.setCantidad(e.getCantidad());
         dto.setFechaEntrega(e.getFechaEntrega());
         return dto;
