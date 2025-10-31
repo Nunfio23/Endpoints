@@ -1,6 +1,8 @@
 package com.example.ProyectoInventario.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -89,8 +91,25 @@ public class ProductoController {
         return productoService.obtenerPorNombre(name);
     }
 
+
     @GetMapping("/categoria/{categoriaId}")
     public ResponseEntity<List<ProductoResponseDTO>> obtenerPorCategoria(@PathVariable Long categoriaId) {
         return ResponseEntity.ok(productoService.obtenerPorCategoria(categoriaId));
     }
+
+    @GetMapping("/bajo-stock")
+    @Operation(summary = "Listar productos con bajo stock (<= umbral, por defecto 3)")
+    public ResponseEntity<List<ProductoResponseDTO>> obtenerProductosConBajoStock(
+        @RequestParam(name = "threshold", required = false, defaultValue = "3") int threshold) {
+
+    BigDecimal umbral = BigDecimal.valueOf(threshold);
+
+    List<ProductoResponseDTO> bajos = productoService.listar()
+            .stream()
+            .filter(p -> p.getStockMaximo() != null
+                    && p.getStockMaximo().compareTo(umbral) <= 0)
+            .collect(Collectors.toList());
+
+    return ResponseEntity.ok(bajos);
+}
 }

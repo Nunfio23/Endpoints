@@ -23,7 +23,7 @@ public class ProductoServiceImpl implements ProductoService {
 
     // Límites de stock
     private static final int MAX_STOCK_LIMIT = 300; // límite máximo permitido
-    private static final int MIN_STOCK_LIMIT = 4;   // límite mínimo permitido
+    private static final int MIN_STOCK_LIMIT = 3;   // límite mínimo permitido
 
     public ProductoServiceImpl(ProductoRepository productoRepository, CategoriaRepository categoriaRepository) {
         this.productoRepository = productoRepository;
