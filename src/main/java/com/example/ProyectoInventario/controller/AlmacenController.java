@@ -1,16 +1,19 @@
 package com.example.ProyectoInventario.controller;
 
-import com.example.ProyectoInventario.entity.Almacen;
+import com.example.ProyectoInventario.dto.AlmacenCreateDTO;
+import com.example.ProyectoInventario.dto.AlmacenUpdateDTO;
+import com.example.ProyectoInventario.dto.AlmacenResponseDTO;
 import com.example.ProyectoInventario.service.AlmacenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/almacenes")
-@Tag(name = "Almacenes", description = "CRUD de almacenes")
+@Tag(name = "Almacenes", description = "CRUD de almacenes con DTOs")
 public class AlmacenController {
 
     private final AlmacenService service;
@@ -19,33 +22,38 @@ public class AlmacenController {
         this.service = service;
     }
 
-    @Operation(summary = "Listar almacenes")
+    @Operation(summary = "Listar todos los almacenes")
     @GetMapping
-    public List<Almacen> listar() {
-        return service.listar();
+    public ResponseEntity<List<AlmacenResponseDTO>> listar() {
+        List<AlmacenResponseDTO> almacenes = service.listar();
+        return ResponseEntity.ok(almacenes);
     }
 
     @Operation(summary = "Obtener almacén por ID")
     @GetMapping("/{id}")
-    public Almacen obtener(@PathVariable Long id) {
-        return service.obtener(id);
+    public ResponseEntity<AlmacenResponseDTO> obtener(@PathVariable Long id) {
+        AlmacenResponseDTO almacen = service.obtener(id);
+        return ResponseEntity.ok(almacen);
     }
 
-    @Operation(summary = "Crear almacén")
+    @Operation(summary = "Crear un nuevo almacén")
     @PostMapping
-    public Almacen crear(@RequestBody Almacen a) {
-        return service.crear(a);
+    public ResponseEntity<AlmacenResponseDTO> crear(@RequestBody AlmacenCreateDTO dto) {
+        AlmacenResponseDTO nuevo = service.crear(dto);
+        return ResponseEntity.ok(nuevo);
     }
 
-    @Operation(summary = "Actualizar almacén")
+    @Operation(summary = "Actualizar un almacén existente")
     @PutMapping("/{id}")
-    public Almacen actualizar(@PathVariable Long id, @RequestBody Almacen a) {
-        return service.actualizar(id, a);
+    public ResponseEntity<AlmacenResponseDTO> actualizar(@PathVariable Long id, @RequestBody AlmacenUpdateDTO dto) {
+        AlmacenResponseDTO actualizado = service.actualizar(id, dto);
+        return ResponseEntity.ok(actualizado);
     }
 
-    @Operation(summary = "Eliminar almacén")
+    @Operation(summary = "Eliminar un almacén por ID")
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         service.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
 }
