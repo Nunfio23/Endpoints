@@ -21,12 +21,18 @@ public class GestionController {
         this.service = service;
     }
 
+    // ======================================================
+    // LISTAR TODAS LAS GESTIONES
+    // ======================================================
     @Operation(summary = "Listar todas las gestiones")
     @GetMapping
     public ResponseEntity<List<GestionResponseDTO>> listar() {
         return ResponseEntity.ok(service.listar());
     }
 
+    // ======================================================
+    // OBTENER GESTIÓN POR ID
+    // ======================================================
     @Operation(summary = "Obtener gestión por ID")
     @GetMapping("/{id}")
     public ResponseEntity<?> obtener(@PathVariable Long id) {
@@ -38,12 +44,13 @@ public class GestionController {
     }
 
     // ======================================================
-    // APROBAR RESTABLECIMIENTO
+    // APROBAR GESTIÓN
     // ======================================================
-    @Operation(summary = "Aprobar un restablecimiento asociado a la gestión")
+    @Operation(summary = "Aprobar una gestión existente")
     @PutMapping("/{id}/aprobar")
-    public ResponseEntity<?> aprobar(@PathVariable Long id,
-                                     @RequestParam(required = false) String observacion) {
+    public ResponseEntity<?> aprobar(
+            @PathVariable Long id,
+            @RequestParam(required = false) String observacion) {
         try {
             GestionResponseDTO aprobada = service.aprobar(id, observacion);
             return ResponseEntity.ok(aprobada);
@@ -55,12 +62,13 @@ public class GestionController {
     }
 
     // ======================================================
-    // RECHAZAR RESTABLECIMIENTO
+    // RECHAZAR GESTIÓN
     // ======================================================
-    @Operation(summary = "Rechazar un restablecimiento asociado a la gestión")
+    @Operation(summary = "Rechazar una gestión existente")
     @PutMapping("/{id}/rechazar")
-    public ResponseEntity<?> rechazar(@PathVariable Long id,
-                                      @RequestParam(required = false) String observacion) {
+    public ResponseEntity<?> rechazar(
+            @PathVariable Long id,
+            @RequestParam(required = false) String observacion) {
         try {
             GestionResponseDTO rechazada = service.rechazar(id, observacion);
             return ResponseEntity.ok(rechazada);
