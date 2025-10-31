@@ -85,7 +85,7 @@ public class ProductoServiceImpl implements ProductoService {
         if (dto.getStockMaximo() != null && dto.getStockMaximo().intValue() > MAX_STOCK_LIMIT) {
             throw new IllegalArgumentException("El stock no puede exceder " + MAX_STOCK_LIMIT + " unidades.");
         }
-        if (dto.getStockMinimo() != null && dto.getStockMinimo().intValue() < MIN_STOCK_LIMIT) {
+        if (dto.getStockMaximo() != null && dto.getStockMaximo().intValue() < MIN_STOCK_LIMIT) {
             throw new IllegalArgumentException("El stock mínimo no puede ser menor a " + MIN_STOCK_LIMIT + " unidades.");
         }
 
