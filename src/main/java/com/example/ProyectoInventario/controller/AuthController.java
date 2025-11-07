@@ -21,7 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://127.0.0.1:5500", allowCredentials = "true")
+@CrossOrigin(origins = "https://invproyec.netlify.app", allowCredentials = "true")
 public class AuthController {
 
     @Autowired
