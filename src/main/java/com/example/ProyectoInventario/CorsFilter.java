@@ -25,8 +25,8 @@ public class CorsFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest request = (HttpServletRequest) req;
 
-        // ✅ Cambia "*" por el dominio de tu frontend
         response.setHeader("Access-Control-Allow-Origin", "https://proyectoinvetariol.netlify.app");
+        response.setHeader("Vary", "Origin"); // 👈 importante para proxies
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization");
         response.setHeader("Access-Control-Allow-Credentials", "true");
@@ -38,3 +38,4 @@ public class CorsFilter implements Filter {
         }
     }
 }
+
