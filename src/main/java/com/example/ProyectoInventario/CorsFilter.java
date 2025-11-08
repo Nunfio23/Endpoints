@@ -29,7 +29,6 @@ public class CorsFilter implements Filter {
         if ("https://proyectoinvetariol.netlify.app".equals(origin) || "http://127.0.0.1:5500".equals(origin) || "http://localhost:5500".equals(origin)) {
         response.setHeader("Access-Control-Allow-Origin", origin);
 }
-
         response.setHeader("Vary", "Origin"); 
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
         response.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization");
@@ -42,4 +41,3 @@ public class CorsFilter implements Filter {
         }
     }
 }
-
