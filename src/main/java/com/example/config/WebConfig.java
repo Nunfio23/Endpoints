@@ -18,6 +18,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins(
                     "http://127.0.0.1:5500",
+                    "https://proyectoinvetariol.netlify.app",
+                    "http://127.0.0.1:5500",
                     "http://localhost:5500",
                     "http://185.216.75.41",
                     "http://37.60.243.227",
@@ -32,6 +34,8 @@ public class WebConfig implements WebMvcConfigurer {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList(
+            "http://127.0.0.1:5500",
+            "https://proyectoinvetariol.netlify.app",
             "http://127.0.0.1:5500",
             "http://localhost:5500",
             "http://185.216.75.41",
