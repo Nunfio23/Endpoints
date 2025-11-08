@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin; 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -25,6 +26,14 @@ import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/productos")
+@CrossOrigin(
+    origins = {
+        "https://proyectoinvetariol.netlify.app",
+        "http://127.0.0.1:5500",
+        "http://localhost:5500"
+    },
+    allowCredentials = "true"
+)
 public class ProductoController {
 
     private final ProductoService productoService;
@@ -91,7 +100,6 @@ public class ProductoController {
         return productoService.obtenerPorNombre(name);
     }
 
-
     @GetMapping("/categoria/{categoriaId}")
     public ResponseEntity<List<ProductoResponseDTO>> obtenerPorCategoria(@PathVariable Long categoriaId) {
         return ResponseEntity.ok(productoService.obtenerPorCategoria(categoriaId));
@@ -102,14 +110,14 @@ public class ProductoController {
     public ResponseEntity<List<ProductoResponseDTO>> obtenerProductosConBajoStock(
         @RequestParam(name = "threshold", required = false, defaultValue = "3") int threshold) {
 
-    BigDecimal umbral = BigDecimal.valueOf(threshold);
+        BigDecimal umbral = BigDecimal.valueOf(threshold);
 
-    List<ProductoResponseDTO> bajos = productoService.listar()
-            .stream()
-            .filter(p -> p.getStockMaximo() != null
-                    && p.getStockMaximo().compareTo(umbral) <= 0)
-            .collect(Collectors.toList());
+        List<ProductoResponseDTO> bajos = productoService.listar()
+                .stream()
+                .filter(p -> p.getStockMaximo() != null
+                        && p.getStockMaximo().compareTo(umbral) <= 0)
+                .collect(Collectors.toList());
 
-    return ResponseEntity.ok(bajos);
-}
+        return ResponseEntity.ok(bajos);
+    }
 }
